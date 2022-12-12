@@ -1,7 +1,8 @@
-import Communication.*;
-import utils.*;
+package utils;
 
-public class WorkflowOrchestrator {
+import Communication.*;
+
+public abstract class OrchestratorBase {
     private final IQuoteQueues _quoteQueues;
     private final IPricerQueues _pricerQueues;
     private final QueueListener<Quote> _quoteRequestListener;
@@ -9,9 +10,7 @@ public class WorkflowOrchestrator {
     private final QueueListener<Quote> _quoteStopListener;
     private final QueueListener<QuotePrice> _quotePriceListener;
 
-    private final Double ExecutionTolerance = 0.000001;
-
-    public WorkflowOrchestrator(IQuoteQueues quoteQueues, IPricerQueues pricerQueues) {
+    public OrchestratorBase(IQuoteQueues quoteQueues, IPricerQueues pricerQueues) {
         _quoteRequestListener = new QueueListener<Quote>(quoteQueues.GetQuoteRequestQueue(), o -> OnQuoteRequest(o));
         _quoteExecuteListener = new QueueListener<QuoteExecutionPrice>(quoteQueues.GetPriceExecutionQueue(), o -> OnExecutionRequest(o));
         _quoteStopListener = new QueueListener<Quote>(quoteQueues.GetQuoteStopQueue(), o -> OnQuoteStop(o));
@@ -19,19 +18,23 @@ public class WorkflowOrchestrator {
 
         _quoteQueues = quoteQueues;
         _pricerQueues = pricerQueues;
-
     }
 
-    private void OnQuoteRequest(Quote o) {
-
+    protected abstract void OnQuoteRequest(Quote o);
+    protected abstract void OnQuotePriceUpdate(QuotePrice o);
+    protected abstract void OnExecutionRequest(QuoteExecutionPrice o);
+    protected abstract void OnQuoteStop(Quote o);
+    protected void NotifyQuoteReceived(Quote o){
+        _quoteQueues.GetQuoteReplyQueue().add(o);
     }
-    private void OnQuotePriceUpdate(QuotePrice o) {
+    protected void NotifyPriceUpdated(QuotePrice o){
+        _quoteQueues.GetPriceUpdateQueue().add(o);
     }
-
-    private void OnExecutionRequest(QuoteExecutionPrice o) {
-
+    protected void NotifyQuoteExecuted(QuoteExecutionPrice o){
+        _quoteQueues.GetPriceExecutionReplyQueue().add(o);
     }
-    private void OnQuoteStop(Quote o) {
+    protected void NotifyQuoteStopped(Quote o){
+        _quoteQueues.GetQuoteStopReplyQueue().add(o);
     }
 
     public void Start() {
