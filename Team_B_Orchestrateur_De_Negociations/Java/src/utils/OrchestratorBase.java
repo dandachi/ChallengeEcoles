@@ -36,6 +36,9 @@ public abstract class OrchestratorBase {
     protected void NotifyQuoteStopped(Quote o){
         _quoteQueues.GetQuoteStopReplyQueue().add(o);
     }
+    protected void RequestNewPrice(Quote o){
+        _pricerQueues.GetPricingRequestQueue().add(o);
+    }
 
     public void Start() {
         _quoteRequestListener.Start();
