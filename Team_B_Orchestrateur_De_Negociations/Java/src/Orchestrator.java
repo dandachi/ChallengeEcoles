@@ -1,11 +1,11 @@
 import Communication.IPricerQueues;
 import Communication.IQuoteQueues;
 import utils.*;
-
 import java.util.concurrent.*;
 
 public class Orchestrator extends OrchestratorBase {
     protected final Double ExecutionTolerance = 0.000001;
+    private ScheduledExecutorService _scheduler;
     // add code
 
     public Orchestrator(IQuoteQueues quoteQueues, IPricerQueues pricerQueues) {
@@ -31,7 +31,6 @@ public class Orchestrator extends OrchestratorBase {
         var anyValidPrice = false;
         // TODO check if there is a quote price  from the last 3 quote prices
         //  that is equal to execution price within EXECUTION Tolerance
-
         if (anyValidPrice)
         {
             o.Status = ExecutionStatus.Success;
@@ -48,7 +47,6 @@ public class Orchestrator extends OrchestratorBase {
 
     @Override
     protected void OnQuoteStop(Quote o) {
-
         // TODO clean unwanted quotes and quote prices
         NotifyQuoteStopped(o);
     }
