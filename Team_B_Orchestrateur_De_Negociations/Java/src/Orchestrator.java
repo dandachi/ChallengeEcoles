@@ -27,7 +27,7 @@ public class Orchestrator extends OrchestratorBase {
 
     @Override
     protected void OnExecutionRequest(QuoteExecutionPrice o) {
-        // add code
+        
         var anyValidPrice = false;
         // TODO check if there is a quote price  from the last 3 quote prices
         //  that is equal to execution price within EXECUTION Tolerance
@@ -56,13 +56,13 @@ public class Orchestrator extends OrchestratorBase {
     @Override
     public void Start() {
         super.Start();
-        // add code
+        
         _scheduler = Executors.newScheduledThreadPool(1);
         _scheduler.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
                 // TODO Schedule a pricing task
-                // We should ask for a pricing for each quote we that is alive
+                // We should ask for a pricing for each quote that we have in memory
                 // Communication with pricer can be done using the method RequestNewPrice
             }
         }, 1, 2, TimeUnit.SECONDS);
